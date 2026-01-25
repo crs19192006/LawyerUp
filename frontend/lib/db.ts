@@ -13,7 +13,10 @@ function initDatabase(db: Database.Database) {
       email TEXT NOT NULL UNIQUE,
       role TEXT NOT NULL,
       password_hash TEXT NOT NULL,
-      created_at TEXT NOT NULL
+      created_at TEXT NOT NULL,
+      bpl_certificate_url TEXT,
+      college TEXT,
+      contact_number TEXT
     );
 
     CREATE TABLE IF NOT EXISTS cases (
@@ -26,6 +29,8 @@ function initDatabase(db: Database.Database) {
       difficulty_score INTEGER NOT NULL,
       complexity_tag TEXT NOT NULL,
       status TEXT NOT NULL,
+      status_note TEXT,
+      next_hearing_at TEXT,
       created_at TEXT NOT NULL,
       FOREIGN KEY (client_id) REFERENCES users(id),
       FOREIGN KEY (assigned_lawyer_id) REFERENCES users(id)
@@ -53,6 +58,31 @@ function initDatabase(db: Database.Database) {
       FOREIGN KEY (lawyer_id) REFERENCES users(id)
     );
   `);
+
+  const userColumns = db
+    .prepare("PRAGMA table_info(users)")
+    .all() as Array<{ name: string }>;
+  const columnNames = new Set(userColumns.map((column) => column.name));
+  if (!columnNames.has("bpl_certificate_url")) {
+    db.prepare("ALTER TABLE users ADD COLUMN bpl_certificate_url TEXT").run();
+  }
+  if (!columnNames.has("college")) {
+    db.prepare("ALTER TABLE users ADD COLUMN college TEXT").run();
+  }
+  if (!columnNames.has("contact_number")) {
+    db.prepare("ALTER TABLE users ADD COLUMN contact_number TEXT").run();
+  }
+
+  const caseColumns = db
+    .prepare("PRAGMA table_info(cases)")
+    .all() as Array<{ name: string }>;
+  const caseColumnNames = new Set(caseColumns.map((column) => column.name));
+  if (!caseColumnNames.has("status_note")) {
+    db.prepare("ALTER TABLE cases ADD COLUMN status_note TEXT").run();
+  }
+  if (!caseColumnNames.has("next_hearing_at")) {
+    db.prepare("ALTER TABLE cases ADD COLUMN next_hearing_at TEXT").run();
+  }
 }
 
 export function getDb() {

@@ -3,11 +3,18 @@ node_modules/
 dist/
 *.sqlite
 .env
+.env.local
+.env.*
 .DS_Store
 node_modules
 .next
 data
 *.log
+__pycache__/
+frontend/public/uploads/
+
+# Do not commit local notes
+git rm -r --cached frontend/node_modules
 
 git rm -r --cached frontend/node_modules
 

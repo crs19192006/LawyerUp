@@ -4,10 +4,16 @@ import { createSession, hashPassword } from "../../../../lib/authServer";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
-  const { name, email, password, role } = body ?? {};
+  const { name, email, password, role, college, certificateUrl, contactNumber } = body ?? {};
 
   if (!name || !email || !password || !role) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  }
+  if (role === "student" && !college) {
+    return NextResponse.json({ error: "College is required for students" }, { status: 400 });
+  }
+  if (role === "client" && !certificateUrl) {
+    return NextResponse.json({ error: "BPL certificate is required for clients" }, { status: 400 });
   }
 
   const db = getDb();
@@ -15,8 +21,8 @@ export async function POST(request: Request) {
 
   try {
     db.prepare(
-      `INSERT INTO users (id, name, email, role, password_hash, created_at)
-       VALUES (@id, @name, @email, @role, @password_hash, @created_at)`
+      `INSERT INTO users (id, name, email, role, password_hash, created_at, bpl_certificate_url, college)
+       VALUES (@id, @name, @email, @role, @password_hash, @created_at, @bpl_certificate_url, @college)`
     ).run({
       id: crypto.randomUUID(),
       name,
@@ -24,7 +30,15 @@ export async function POST(request: Request) {
       role,
       password_hash: passwordHash,
       created_at: new Date().toISOString(),
+      bpl_certificate_url: role === "client" ? certificateUrl : null,
+      college: role === "student" ? college : null,
     });
+    if (role === "lawyer" && contactNumber) {
+      db.prepare("UPDATE users SET contact_number = ? WHERE email = ?").run(
+        contactNumber,
+        email
+      );
+    }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Error";
     if (message.includes("UNIQUE")) {

@@ -17,7 +17,7 @@ export async function POST(
   const db = getDb();
   const assignment = db
     .prepare("SELECT * FROM case_student_assignments WHERE id = ?")
-    .get(params.id);
+    .get(params.id) as { student_id: string } | undefined;
 
   if (!assignment) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

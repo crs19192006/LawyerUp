@@ -12,7 +12,11 @@ export async function GET(
   }
 
   const db = getDb();
-  const caseRow = db.prepare("SELECT * FROM cases WHERE id = ?").get(params.id);
+  const caseRow = db
+    .prepare("SELECT * FROM cases WHERE id = ?")
+    .get(params.id) as
+    | { client_id: string; assigned_lawyer_id: string | null }
+    | undefined;
 
   if (!caseRow) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -20,6 +24,13 @@ export async function GET(
 
   const isClientOwner = caseRow.client_id === user.id;
   const isAssignedLawyer = caseRow.assigned_lawyer_id === user.id;
+  const isAssignedStudent =
+    user.role === "student" &&
+    !!db
+      .prepare(
+        "SELECT id FROM case_student_assignments WHERE case_id = ? AND student_id = ?"
+      )
+      .get(params.id, user.id);
 
   // Enforce ownership so users cannot access other clients' cases.
   if (user.role === "client" && !isClientOwner) {
@@ -28,7 +39,7 @@ export async function GET(
   if (user.role === "lawyer" && !isAssignedLawyer) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  if (user.role === "student") {
+  if (user.role === "student" && !isAssignedStudent) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -38,7 +49,7 @@ export async function GET(
 
   const acceptedStudents = db
     .prepare(
-      `SELECT u.id, u.name, a.status
+      `SELECT u.id, u.name, u.college, a.status
        FROM case_student_assignments a
        JOIN users u ON u.id = a.student_id
        WHERE a.case_id = ? AND a.status = 'accepted'`
@@ -47,7 +58,7 @@ export async function GET(
 
   const pendingStudents = db
     .prepare(
-      `SELECT u.id, u.name, a.status
+      `SELECT u.id, u.name, u.college, a.status
        FROM case_student_assignments a
        JOIN users u ON u.id = a.student_id
        WHERE a.case_id = ? AND a.status = 'pending'`
@@ -58,5 +69,16 @@ export async function GET(
     ? db.prepare("SELECT id, name FROM users WHERE id = ?").get(caseRow.assigned_lawyer_id)
     : null;
 
-  return NextResponse.json({ case: caseRow, documents, lawyer, acceptedStudents, pendingStudents });
+  const client = db
+    .prepare("SELECT id, name, email, bpl_certificate_url FROM users WHERE id = ?")
+    .get(caseRow.client_id);
+
+  return NextResponse.json({
+    case: caseRow,
+    client,
+    documents,
+    lawyer,
+    acceptedStudents,
+    pendingStudents,
+  });
 }

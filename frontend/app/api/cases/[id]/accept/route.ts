@@ -15,7 +15,9 @@ export async function POST(
   }
 
   const db = getDb();
-  const caseRow = db.prepare("SELECT * FROM cases WHERE id = ?").get(params.id);
+  const caseRow = db
+    .prepare("SELECT * FROM cases WHERE id = ?")
+    .get(params.id) as { assigned_lawyer_id: string | null } | undefined;
 
   if (!caseRow) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -31,6 +33,14 @@ export async function POST(
     params.id
   );
 
-  const updated = db.prepare("SELECT * FROM cases WHERE id = ?").get(params.id);
+  const updated = db
+    .prepare(
+      `SELECT c.*, u.name AS client_name, u.email AS client_email,
+              u.bpl_certificate_url AS client_bpl_certificate_url
+       FROM cases c
+       JOIN users u ON u.id = c.client_id
+       WHERE c.id = ?`
+    )
+    .get(params.id);
   return NextResponse.json({ case: updated });
 }

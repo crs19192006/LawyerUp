@@ -13,7 +13,9 @@ export async function GET() {
 
   const db = getDb();
   const students = db
-    .prepare("SELECT id, name, email FROM users WHERE role = 'student' ORDER BY name ASC")
+    .prepare(
+      "SELECT id, name, email, college FROM users WHERE role = 'student' ORDER BY name ASC"
+    )
     .all();
 
   return NextResponse.json({ students });

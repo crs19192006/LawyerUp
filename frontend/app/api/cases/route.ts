@@ -13,17 +13,36 @@ export async function GET() {
 
   // Ownership checks keep cases isolated per user role.
   if (user.role === "client") {
-    const cases = db.prepare("SELECT * FROM cases WHERE client_id = ?").all(user.id);
+    const cases = db
+      .prepare(
+        `SELECT c.*, u.name AS lawyer_name, u.email AS lawyer_email, u.contact_number AS lawyer_contact_number
+         FROM cases c
+         LEFT JOIN users u ON u.id = c.assigned_lawyer_id
+         WHERE c.client_id = ?`
+      )
+      .all(user.id);
     return NextResponse.json({ cases });
   }
 
   if (user.role === "lawyer") {
     // Marketplace visibility: lawyers can see open cases + their own accepted cases.
     const openCases = db
-      .prepare("SELECT * FROM cases WHERE assigned_lawyer_id IS NULL")
+      .prepare(
+        `SELECT c.*, u.name AS client_name, u.email AS client_email,
+                u.bpl_certificate_url AS client_bpl_certificate_url
+         FROM cases c
+         JOIN users u ON u.id = c.client_id
+         WHERE c.assigned_lawyer_id IS NULL`
+      )
       .all();
     const myCases = db
-      .prepare("SELECT * FROM cases WHERE assigned_lawyer_id = ?")
+      .prepare(
+        `SELECT c.*, u.name AS client_name, u.email AS client_email,
+                u.bpl_certificate_url AS client_bpl_certificate_url
+         FROM cases c
+         JOIN users u ON u.id = c.client_id
+         WHERE c.assigned_lawyer_id = ?`
+      )
       .all(user.id);
     return NextResponse.json({ openCases, myCases });
   }

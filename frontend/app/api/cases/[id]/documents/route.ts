@@ -12,7 +12,11 @@ export async function POST(
   }
 
   const db = getDb();
-  const caseRow = db.prepare("SELECT * FROM cases WHERE id = ?").get(params.id);
+  const caseRow = db
+    .prepare("SELECT * FROM cases WHERE id = ?")
+    .get(params.id) as
+    | { client_id: string; assigned_lawyer_id: string | null }
+    | undefined;
 
   if (!caseRow) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

@@ -4,7 +4,7 @@ import { createSession, verifyPassword } from "../../../../lib/authServer";
 
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
-  const { email, password, role } = body ?? {};
+  const { email, password, role, certificateUrl, college, contactNumber } = body ?? {};
 
   if (!email || !password || !role) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
@@ -21,9 +21,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
+  if (role === "student" && !college) {
+    return NextResponse.json({ error: "College is required" }, { status: 400 });
+  }
+  if (role === "lawyer" && !contactNumber) {
+    return NextResponse.json({ error: "Contact number is required" }, { status: 400 });
+  }
+
   const isValid = await verifyPassword(password, row.password_hash);
   if (!isValid) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+  }
+
+  if (role === "student" && college) {
+    db.prepare("UPDATE users SET college = ? WHERE id = ?").run(college, row.id);
+  }
+  if (role === "lawyer" && contactNumber) {
+    db.prepare("UPDATE users SET contact_number = ? WHERE id = ?").run(contactNumber, row.id);
   }
 
   const user = { id: row.id, email: row.email, role: row.role };

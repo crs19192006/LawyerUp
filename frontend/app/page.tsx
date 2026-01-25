@@ -1,90 +1,70 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export default function LandingPage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-16 px-6 py-12">
-      <nav className="flex items-center justify-between text-sm text-slate-400">
-        <span className="flex items-center gap-2 text-white">
-          <span className="h-2 w-2 rounded-full bg-indigo-400" />
-          <span className="font-semibold tracking-wide">NyayaConnect</span>
-        </span>
-        <span className="rounded-full border border-slate-800 px-3 py-1 text-xs text-slate-300">
-          India · Demo MVP
+    <main className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center gap-14 px-6 py-12 text-center">
+      <nav className="flex w-full items-center justify-center text-sm text-slate-500">
+        <span className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-indigo-500" />
+          <span className="text-2xl font-semibold tracking-wide text-slate-900">LawyerUp</span>
         </span>
       </nav>
 
-      <section className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-        <div className="space-y-6">
-          <p className="text-xs uppercase tracking-[0.3em] text-indigo-300">
-            Decentralized Pro-Bono Legal Aid
-          </p>
-          <h1 className="text-4xl font-semibold text-white lg:text-5xl">
-            Connect verified clients with pro-bono lawyers and law students.
-          </h1>
-          <p className="text-lg text-slate-300">
-            NyayaConnect coordinates eligibility-verified cases, smart case scoring,
-            and transparent timelines—built for speed, clarity, and demo impact.
-          </p>
-          <div className="flex flex-wrap gap-4 text-xs text-slate-400">
-            <span className="rounded-full border border-slate-800 px-3 py-1">
-              Role-based access
-            </span>
-            <span className="rounded-full border border-slate-800 px-3 py-1">
-              Audit-friendly trails
-            </span>
-            <span className="rounded-full border border-slate-800 px-3 py-1">
-              India-ready flows
-            </span>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-3">
+      <section className="space-y-10">
+        <p className="text-xs uppercase tracking-[0.3em] text-indigo-600">
+          Decentralized Pro-Bono Legal Aid
+        </p>
+        <h1 className="text-4xl font-semibold leading-tight text-slate-900 lg:text-6xl">
+          Connect verified clients with pro-bono lawyers and law students.
+        </h1>
+        <p className="text-lg leading-relaxed text-slate-600">
+          LawyerUp coordinates eligibility-verified cases, thoughtful case scoring,
+          and transparent timelines—built for speed, clarity, and care.
+        </p>
+        <div className="flex flex-wrap justify-center gap-3 text-xs text-slate-500">
+          <span className="rounded-full border border-slate-200 bg-white px-3 py-1">
+            Role-based access
+          </span>
+          <span className="rounded-full border border-slate-200 bg-white px-3 py-1">
+            Audit-friendly trails
+          </span>
+          <span className="rounded-full border border-slate-200 bg-white px-3 py-1">
+            India-ready flows
+          </span>
+        </div>
+        <div className="grid w-full gap-4 md:grid-cols-3">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <Link
               href="/login/client"
-              className="rounded-2xl bg-indigo-500 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-indigo-400"
+              className="block rounded-xl bg-slate-900 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-800"
             >
               Login as Client
             </Link>
+            <p className="mt-3 text-xs leading-relaxed text-slate-600">
+              File new cases and keep all your documents in one place.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <Link
               href="/login/lawyer"
-              className="rounded-2xl border border-slate-700 px-6 py-3 text-center text-sm font-semibold text-slate-200 transition hover:border-slate-500"
+              className="block rounded-xl border border-slate-300 px-6 py-3 text-center text-sm font-semibold text-slate-800 transition hover:border-slate-400"
             >
               Login as Lawyer
             </Link>
+            <p className="mt-3 text-xs leading-relaxed text-slate-600">
+              Register as a lawyer and view all open cases to accept.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <Link
               href="/login/student"
-              className="rounded-2xl border border-slate-700 px-6 py-3 text-center text-sm font-semibold text-slate-200 transition hover:border-slate-500"
+              className="block rounded-xl border border-slate-300 px-6 py-3 text-center text-sm font-semibold text-slate-800 transition hover:border-slate-400"
             >
               Login as Law Student
             </Link>
-          </div>
-        </div>
-
-        <div className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900/80 via-slate-900 to-indigo-900/30 p-8">
-          <div className="absolute right-6 top-6 h-24 w-24 rounded-full bg-indigo-500/20 blur-2xl" />
-          <div className="flex flex-col gap-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-white">Demo Highlights</h2>
-              <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs text-emerald-200">
-                Live MVP
-              </span>
-            </div>
-            <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4">
-              <Image
-                src="/lady-justice.svg"
-                alt="Lady Justice"
-                width={520}
-                height={580}
-                className="h-64 w-full rounded-2xl object-cover"
-                priority
-              />
-            </div>
-            <ul className="space-y-3 text-sm text-slate-300">
-              <li>Verified client eligibility with secure intake</li>
-              <li>Role-based dashboards for clients, lawyers, and students</li>
-              <li>Smart case scoring with complexity tags</li>
-              <li>Transparency layer with status + document history</li>
-              <li>Legal document simplifier (mocked)</li>
-            </ul>
+            <p className="mt-3 text-xs leading-relaxed text-slate-600">
+              View cases accepted by lawyers and apply to intern on them.
+            </p>
           </div>
         </div>
       </section>
