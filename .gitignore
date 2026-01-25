@@ -1,0 +1,14 @@
+node_modules/
+.next/
+dist/
+*.sqlite
+.env
+.DS_Store
+node_modules
+.next
+data
+*.log
+
+git rm -r --cached frontend/node_modules
+
+
